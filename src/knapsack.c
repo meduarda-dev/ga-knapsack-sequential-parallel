@@ -131,14 +131,32 @@ static void *evolve_chunk(void *arg) {
     int n = ta->instance->n_items;
     Individual *pop = ta->population;
 
+printf("Thread trabalhando: intervalo [%d - %d)\n",
+           ta->start, ta->end);
+
     for (int i = ta->start; i < ta->end; i++) {
+
+        if (i == ta->start) {
+    printf("[THREAD %d-%d] Gerando individuos...\n", ta->start, ta->end);
+}
+
         int p1 = tournament(pop, ta->params->pop_size, &ta->seed);
         int p2 = tournament(pop, ta->params->pop_size, &ta->seed);
+
+        if (i == ta->start) {
+    printf("[THREAD %d-%d] Pais escolhidos: %d e %d\n",
+           ta->start, ta->end, p1, p2);
+}
 
         Individual child;
         crossover(&pop[p1], &pop[p2], &child, n, &ta->seed);
         mutate(&child, n, ta->params->mutation_rate, &ta->seed);
         evaluate(&child, ta->instance);
+
+        if (i == ta->start) {
+    printf("[THREAD %d-%d] Filho gerado com fitness: %.0f\n",
+           ta->start, ta->end, child.fitness);
+}
 
         pop[ta->params->pop_size + i] = child;
     }
@@ -167,6 +185,11 @@ GAResult ga_parallel(KnapsackInstance *inst, GAParams *params) {
     for (int gen = 0; gen < params->max_generations; gen++) {
 
         int best_idx = find_best(pop, ps);
+
+        if (gen % 50 == 0) {
+    printf("\n=== GERACAO %d ===\n", gen);
+    printf("Melhor atual: %.0f\n", pop[best_idx].fitness);
+}
         pop[ps].genes = malloc(n * sizeof(int));
         memcpy(pop[ps].genes, pop[best_idx].genes, n * sizeof(int));
         evaluate(&pop[ps], inst);
