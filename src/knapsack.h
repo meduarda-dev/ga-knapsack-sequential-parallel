@@ -16,7 +16,7 @@ typedef struct {
 } KnapsackInstance;
 
 typedef struct {
-    int *genes;      // array binário de tamanho n_items
+    int *genes;
     int total_value;
     int total_weight;
     double fitness;
@@ -43,11 +43,8 @@ typedef struct {
     double elapsed_ms;
 } GAResult;
 
-// Carrega instância do arquivo
 KnapsackInstance load_instance(const char *input_path, const char *optimum_path);
 void free_instance(KnapsackInstance *inst);
-
-// Algoritmo genético paralelo
 GAResult ga_parallel(KnapsackInstance *inst, GAParams *params);
 
 #endif
